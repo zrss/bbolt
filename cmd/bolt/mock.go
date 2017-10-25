@@ -3,9 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	bolt "github.com/coreos/bbolt"
@@ -20,16 +17,19 @@ func main() {
 	}
 	defer db.Close()
 
-	db.Update(func(tx *bolt.Tx) error {
+	/*db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte("MyBucket"))
 		if err != nil {
 			return err
 		}
 		return err
-	})
+	})*/
 
 	go func() {
 		db.View(func(tx *bolt.Tx) error {
+			s := db.Stats()
+			fmt.Printf("read txn txid: %d. pending: %d, free: %d, open: %d\n", tx.ID(), s.PendingPageN, s.FreePageN, s.OpenTxN)
+
 			fmt.Printf("start of long run read txn\n")
 			fmt.Printf("read txn txid: %d\n", tx.ID())
 			bucket := tx.Bucket([]byte("MyBucket"))
@@ -42,19 +42,14 @@ func main() {
 	}()
 
 	mockValue := make([]byte, 1024)
-	for i := 0; i < 64; i++ {
+	for i := 0; i < 1024; i++ {
+		time.Sleep(1 * time.Second)
 		db.Update(func(tx *bolt.Tx) error {
-			fmt.Printf("rw txn txid: %d\n", tx.ID())
 			b := tx.Bucket([]byte("MyBucket"))
 			err = b.Put([]byte("answer"), mockValue)
 			return err
 		})
 	}
 
-	c := make(chan os.Signal, 2)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-c
-		os.Exit(1)
-	}()
+	<-time.After(20 * time.Second)
 }

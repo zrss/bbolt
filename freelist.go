@@ -123,6 +123,8 @@ func (f *freelist) free(txid txid, p *page) {
 		panic(fmt.Sprintf("cannot free page 0 or 1: %d", p.id))
 	}
 
+	fmt.Printf("trigger free. txid: %d. page id: %d.\n", txid, p.id)
+
 	// Free page and all its overflow pages.
 	txp := f.pending[txid]
 	if txp == nil {
@@ -180,6 +182,7 @@ func (f *freelist) releaseRange(begin, end txid) {
 		}
 		for i := 0; i < len(txp.ids); i++ {
 			if atx := txp.alloctx[i]; atx < begin || atx > end {
+				fmt.Printf("ignore releaseRange. atx %d\n", atx)
 				continue
 			}
 			m = append(m, txp.ids[i])

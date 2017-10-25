@@ -479,11 +479,13 @@ func (tx *Tx) allocate(count int) (*page, error) {
 		return nil, err
 	}
 
+	fmt.Printf("tx: %d. allocate %d page. page id: %d\n", tx.ID(), count, p.id)
+
 	// Save to our page cache.
 	tx.pages[p.id] = p
 
 	// Update statistics.
-	tx.stats.PageCount++
+	tx.stats.PageCount += count
 	tx.stats.PageAlloc += count * tx.db.pageSize
 
 	return p, nil

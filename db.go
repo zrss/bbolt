@@ -581,6 +581,11 @@ func (db *DB) beginRWTx() (*Tx, error) {
 	t.init(db)
 	db.rwtx = t
 	db.freePages()
+
+	fmt.Printf("rw tx %d after finished db pending count: %d\n", t.ID(), db.freelist.pending_count())
+	for txid, txp := range db.freelist.pending {
+		fmt.Printf("pending txid: %d, pending page: %d, allocate txid: %d\n", txid, txp.ids, txp.alloctx)
+	}
 	return t, nil
 }
 
