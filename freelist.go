@@ -137,7 +137,7 @@ func (f *freelist) free(txid txid, p *page) {
 	} else if (p.flags & (freelistPageFlag | metaPageFlag)) != 0 {
 		// Safe to claim txid as allocating since these types are private to txid.
 		allocTxid = txid
-	}
+	} // or p.flags == leafPage (0x02) but allocTxid not found default is 0
 
 	for id := p.id; id <= p.id+pgid(p.overflow); id++ {
 		// Verify that page is not already free.
