@@ -277,6 +277,8 @@ func (n *node) splitTwo(pageSize int) (*node, *node) {
 		return n, nil
 	}
 
+	fmt.Printf("true split\n")
+
 	// Determine the threshold before starting a new node.
 	var fillPercent = n.bucket.FillPercent
 	if fillPercent < minFillPercent {
@@ -292,6 +294,7 @@ func (n *node) splitTwo(pageSize int) (*node, *node) {
 	// Split node into two separate nodes.
 	// If there's no parent then we'll need to create one.
 	if n.parent == nil {
+		fmt.Printf("new parent\n")
 		n.parent = &node{bucket: n.bucket, children: []*node{n}}
 	}
 
@@ -357,10 +360,11 @@ func (n *node) spill() error {
 
 	// Split nodes into appropriate sizes. The first node will always be n.
 	var nodes = n.split(tx.db.pageSize)
+	fmt.Printf("split len %d\n", len(nodes))
 	for _, node := range nodes {
 		// Add node's page to the freelist if it's not new.
 		if node.pgid > 0 {
-			fmt.Printf("split txid %d page id %d page type %d\n", tx.meta.txid, tx.page(node.pgid).id, tx.page(node.pgid).flags)
+			fmt.Printf("split txid %d page id %d page type %d node pageid: %d\n", tx.meta.txid, tx.page(node.pgid).id, tx.page(node.pgid).flags, node.pgid)
 			tx.db.freelist.free(tx.meta.txid, tx.page(node.pgid))
 			node.pgid = 0
 		}
