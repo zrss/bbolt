@@ -360,7 +360,7 @@ func (n *node) spill() error {
 	for _, node := range nodes {
 		// Add node's page to the freelist if it's not new.
 		if node.pgid > 0 {
-			fmt.Printf("split txid %d page id %d\n", tx.meta.txid, tx.page(node.pgid).id)
+			fmt.Printf("split txid %d page id %d page type %d\n", tx.meta.txid, tx.page(node.pgid).id, tx.page(node.pgid).flags)
 			tx.db.freelist.free(tx.meta.txid, tx.page(node.pgid))
 			node.pgid = 0
 		}

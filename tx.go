@@ -54,6 +54,12 @@ func (tx *Tx) init(db *DB) {
 	tx.root.bucket = &bucket{}
 	*tx.root.bucket = tx.meta.root
 
+	if tx.writable {
+		fmt.Printf("rw meta root: %d\n", tx.root.bucket.root)
+	} else {
+		fmt.Printf("read meta root: %d\n", tx.root.bucket.root)
+	}
+
 	// Increment the transaction id and add a page cache for writable transactions.
 	if tx.writable {
 		tx.pages = make(map[pgid]*page)
