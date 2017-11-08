@@ -52,6 +52,10 @@ func (tx *Tx) init(db *DB) {
 	// Copy over the root bucket.
 	tx.root = newBucket(tx)
 	tx.root.bucket = &bucket{}
+	// bucket in file
+	// root
+	// sequence
+	// B tree root
 	*tx.root.bucket = tx.meta.root
 
 	if tx.writable {
@@ -62,6 +66,7 @@ func (tx *Tx) init(db *DB) {
 
 	// Increment the transaction id and add a page cache for writable transactions.
 	if tx.writable {
+		// pages cache
 		tx.pages = make(map[pgid]*page)
 		tx.meta.txid += txid(1)
 	}
@@ -613,6 +618,10 @@ func (tx *Tx) forEachPage(pgid pgid, depth int, fn func(*page, int)) {
 
 	// Execute function.
 	fn(p, depth)
+
+	// as the lowest level is a leaf page
+	// when we encounter the leaf page
+	// indicates that is the end of for each page
 
 	// Recursively loop over children.
 	if (p.flags & branchPageFlag) != 0 {

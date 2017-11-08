@@ -988,6 +988,10 @@ func (db *DB) freepages() []pgid {
 
 	var fids []pgid
 	for i := pgid(2); i < db.meta().pgid; i++ {
+		// if there is a page not in B tree
+		// then it is a free page
+
+
 		if _, ok := reachable[i]; !ok {
 			fids = append(fids, i)
 		}
@@ -1084,10 +1088,10 @@ type meta struct {
 	version  uint32
 	pageSize uint32
 	flags    uint32
-	root     bucket
-	freelist pgid
-	pgid     pgid
-	txid     txid
+	root     bucket // db.meta().root
+	freelist pgid 	// free list page id
+	pgid     pgid 	// the end of current page
+	txid     txid 	// associate tx id
 	checksum uint64
 }
 

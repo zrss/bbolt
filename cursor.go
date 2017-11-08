@@ -223,7 +223,7 @@ func (c *Cursor) next() (key []byte, value []byte, flags uint32) {
 		for i = len(c.stack) - 1; i >= 0; i-- {
 			elem := &c.stack[i]
 			if elem.index < elem.count()-1 {
-				elem.index++
+				elem.index++ // 移动到下一个 inode
 				break
 			}
 		}
@@ -236,6 +236,9 @@ func (c *Cursor) next() (key []byte, value []byte, flags uint32) {
 
 		// Otherwise start from where we left off in the stack and find the
 		// first element of the first leaf page.
+		// 回退一步
+		// 向上一级的 first
+		// 即新的 next
 		c.stack = c.stack[:i+1]
 		c.first()
 
